@@ -7,4 +7,4 @@ epsilon=$8
 shift
 horizon=$9
 
-python algorithm.py --instance $instance --algorithm $algorithm --randomSeed $randomSeed --epsilon $epsilon --horizon $horizon
+python3 algorithm.py --instance $instance --algorithm $algorithm --randomSeed $randomSeed --epsilon $epsilon --horizon $horizon

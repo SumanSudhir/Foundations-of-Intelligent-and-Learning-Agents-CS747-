@@ -110,7 +110,7 @@ class Algorithm:
         min = action_value
         max = 1
         mid_point = (min + max) / 2
-        threhsold = 0.0001
+        threhsold = 0.01
 
         if action_value == 1:
             return 1
@@ -177,8 +177,10 @@ class Algorithm:
             for j in range(len(df)):
                 beta_prob[j] = np.random.beta(
                     success_count[j] + 1, failure_count[j] + 1)
-
-            argmax = beta_prob.argmax(axis=0)
+            if i == 0:
+                argmax = np.random.choice(np.arange(len(df)))
+            else:
+                argmax = beta_prob.argmax(axis=0)
 
             arm_count[argmax] = arm_count[argmax] + 1
             x = np.random.binomial(1, df[0][argmax])
@@ -193,6 +195,8 @@ class Algorithm:
         regret = max(df[0]) * self.horizon - sum(reward)
         return regret
 
+
+# For bandit.sh
 
 alg = Algorithm(str(args["instance"]), str(args["algorithm"]),
                 int(args["randomSeed"]), float(args["epsilon"]), int(args["horizon"]))
@@ -213,8 +217,4 @@ elif args["algorithm"] == "kl-ucb":
 elif args["algorithm"] == "thompson-sampling":
     regret = alg.thompson_sampling()
 
-# print(regret)
-
-file = open("output.txt", "a")
-file.write(args["instance"] + ", " + args["algorithm"] + ", " +
-           args["randomSeed"] + ", " + args["epsilon"] + ", " + args["horizon"] + ", " + str(regret) + '\n')
+print(regret)

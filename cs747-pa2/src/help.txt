@@ -1,0 +1,6 @@
+1. Number of states
+2. Number of actions
+3. SxA lines of reward function each lines containing S entries where each entries correspond to R(s,a,s')
+4. Similar scheme is adopted for transition function T
+5.  Discount facfor
+6. Type

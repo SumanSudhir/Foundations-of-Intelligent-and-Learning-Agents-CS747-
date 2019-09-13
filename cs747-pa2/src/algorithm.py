@@ -101,20 +101,45 @@ class MDP:
 
     def linear_programmming(self):
 
-        V = np.zeros(self.number_of_states)
-        policy = np.zeros(self.number_of_states, dtype=int)
+        prob = LpProblem("lp", LpMinimize)
+        var_state = LpVariable.dicts("v", range(self.number_of_states))
+        # print(var_state)
+        #prob += lpSum([var_state[i]] for i in range(self.number_of_states))
+        print(prob)
 
         for s in range(self.number_of_states):
-            v_temp = 0
-            for sPrime in range(self.number_of_states):
-                v_temp += self.transition[s][policy[s]][sPrime] * \
-                    (self.reward[s][policy[s]][sPrime] +
-                     self.discount_factor * V[sPrime])
+            for a in range(self.number_of_actions):
+                v = 0
+                for sPrime in range(self.number_of_states):
 
-            V[s] = v_temp
+                    v += self.transition[s][a][sPrime] * \
+                        (self.reward[s][a][sPrime] +
+                         self.discount_factor * var_state[sPrime])
+
+                prob += var_state[s] >= v
+                # print(prob)
+
+        prob.solve()
+        V = np.array([v.varValue for v in prob.variables()])
+        #
+        # for s in range(self.number_of_states):
+        #     old_action = policy[s]
+        #     action = np.zeros(self.number_of_actions)
+        #     for a in range(self.number_of_actions):
+        #         for sPrime in range(self.number_of_states):
+        #             action[a] += self.transition[s][a][sPrime] * \
+        #                 (self.reward[s][a][sPrime] +
+        #                  self.discount_factor * V[sPrime])
+        #
+        #     policy[s] = np.argmax(action)
+
+        print(V)
+        return V
 
 
 x = MDP("/home/sudhirsuman/Desktop/7thSemester/CS747/Assignment/cs747-pa2/data/continuing/MDP10.txt", 'lp')
-y, a = x.policy_iteration()
-print(y)
-print(a)
+# y, a = x.policy_iteration()
+# print(y)
+# print(a)
+
+v = x.linear_programmming()

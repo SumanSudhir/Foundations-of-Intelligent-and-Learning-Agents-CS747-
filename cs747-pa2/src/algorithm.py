@@ -48,14 +48,14 @@ class MDP:
 
         self.discount_factor = float(mdp_file.readline())
         self.task_type = mdp_file.readline()
+        # self.discount_factor = 1
 
         # print(self.discount_factor, self.task_type)
 
-    def policy_iteration(self):
+    def policy_iteration_by_converging(self):
         V = np.zeros(self.number_of_states)
         # policy = np.random.choice(
         #     np.arange(self.number_of_actions), self.number_of_states)
-
         policy = np.zeros(self.number_of_states, dtype=int)
         # print(policy)
         iteration = 0
@@ -74,10 +74,6 @@ class MDP:
                 delta = max(delta, np.abs(v - V[s]))
             # print(V)
             # print(delta)
-            if delta < 0.00000000001:
-                break
-
-            policy_stable = True
 
             for s in range(self.number_of_states):
                 old_action = policy[s]
@@ -90,38 +86,107 @@ class MDP:
 
                 policy[s] = np.argmax(action)
 
-                # if old_action.all() == policy.all():
-                #    policy_stable = True
-                # else:
-                #    policy_stable = False
+            if delta < 0.00000000001:
+                break
+
+            # policy_stable = True
+            # if old_action.all() == policy.all():
+            #    policy_stable = True
+            # else:
+            #    policy_stable = False
             # if policy_stable == True:
             #    break
-        print(iteration)
+        # print(iteration)
+        return V, policy
+
+    def policy_iteration_by_linear_equation(self):
+        policy = np.zeros(self.number_of_states, dtype=int)
+        new_policy = np.zeros(self.number_of_states, dtype=int)
+        V = np.zeros(self.number_of_states)
+        # prob = LpProblem("lp", LpMinimize)
+        # var_state = LpVariable.dicts("V", range(self.number_of_states))
+
+        while True:
+            prob = LpProblem("lp", LpMinimize)
+            var_state = LpVariable.dicts("V", range(self.number_of_states))
+            prob += lpSum([var_state[i] for i in range(self.number_of_states)])
+            i = 0
+            # policy = new_policy.copy()
+            # print(policy)
+            for s in range(self.number_of_states):
+                v_temp = 0
+                for sPrime in range(self.number_of_states):
+                    v_temp += self.transition[s][policy[s]][sPrime] * (
+                        self.reward[s][policy[s]][sPrime] + self.discount_factor * var_state[sPrime])
+
+                prob += var_state[s] == v_temp
+
+            prob.solve()
+            V = np.array([v.varValue for v in prob.variables()])
+
+            for s in range(self.number_of_states):
+                V_temp = np.zeros(self.number_of_actions)
+                for a in range(self.number_of_actions):
+                    v_temp = 0
+                    for sPrime in range(self.number_of_states):
+                        v_temp += self.transition[s][a][sPrime] * (
+                            self.reward[s][a][sPrime] + self.discount_factor * V[sPrime])
+
+                    V_temp[a] = v_temp
+
+                new_policy[s] = np.argmax(V_temp)
+                if policy[s] != new_policy[s]:
+                    policy[s] = new_policy[s]
+                    i = i + 1
+
+            # if policy.all() == new_policy.all():
+            #    break
+            # print(policy)
+            # # print(policy)
+            # print(policy)
+            # print(new_policy)
+            if i == 0:
+                break
+
+        # print(len(V))
         return V, policy
 
     def linear_programmming(self):
 
+        policy = np.zeros(self.number_of_states, dtype=int)
         prob = LpProblem("lp", LpMinimize)
         var_state = LpVariable.dicts("v", range(self.number_of_states))
+
+        prob += lpSum([var_state[i] for i in range(self.number_of_states)])
         # print(var_state)
         #prob += lpSum([var_state[i]] for i in range(self.number_of_states))
-        print(prob)
-
+        # print(prob)
         for s in range(self.number_of_states):
             for a in range(self.number_of_actions):
-                v = 0
+                v_temp = 0
                 for sPrime in range(self.number_of_states):
-
-                    v += self.transition[s][a][sPrime] * \
+                    v_temp += self.transition[s][a][sPrime] * \
                         (self.reward[s][a][sPrime] +
                          self.discount_factor * var_state[sPrime])
 
-                prob += var_state[s] >= v
+                prob += var_state[s] >= v_temp
                 # print(prob)
 
         prob.solve()
         V = np.array([v.varValue for v in prob.variables()])
-        #
+
+        for s in range(self.number_of_states):
+            V_temp = np.zeros(self.number_of_actions)
+            for a in range(self.number_of_actions):
+                v_temp = 0
+                for sPrime in range(self.number_of_states):
+                    v_temp += self.transition[s][a][sPrime] * (
+                        self.reward[s][a][sPrime] + self.discount_factor * V[sPrime])
+
+                V_temp[a] = v_temp
+
+            policy[s] = np.argmax(V_temp)
+
         # for s in range(self.number_of_states):
         #     old_action = policy[s]
         #     action = np.zeros(self.number_of_actions)
@@ -133,13 +198,15 @@ class MDP:
         #
         #     policy[s] = np.argmax(action)
 
-        print(V)
-        return V
+        # print(V)
+        return V, policy
 
 
-x = MDP("/home/sudhirsuman/Desktop/7thSemester/CS747/Assignment/cs747-pa2/data/continuing/MDP10.txt", 'lp')
-# y, a = x.policy_iteration()
-# print(y)
-# print(a)
+x = MDP("/home/sudhirsuman/Desktop/7thSemester/CS747/Assignment/cs747-pa2/data/episodic/MDP10.txt", 'lp')
+y, p = x.policy_iteration_by_linear_equation()
+print(y)
+print(p)
 
-v = x.linear_programmming()
+v, p = x.linear_programmming()
+print(v)
+print(p)

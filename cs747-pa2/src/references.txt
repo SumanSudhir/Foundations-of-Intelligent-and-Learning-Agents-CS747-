@@ -1,3 +1,4 @@
 1. http://incompleteideas.net/book/RLbook2018trimmed.pdf
 2. https://www.udacity.com/course/reinforcement-learning--ud600
 3. https://pythonhosted.org/PuLP/CaseStudies/a_blending_problem.html?fbclid=IwAR3WB50G6xB8PjxJMYOqPBTPvDkeURqO1lUDhO9cuwoYHXKvyJUB0VTb6lU
+4. https://people.eecs.berkeley.edu/~pabbeel/cs287-fa12/slides/mdps-exact-methods.pdf

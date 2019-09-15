@@ -1,8 +1,16 @@
 import argparse
+import sys
 
 import numpy as np
 import pandas as pd
 from pulp import *
+
+ap = argparse.ArgumentParser()
+
+ap.add_argument("--mdp")
+ap.add_argument("--algorithm")
+
+args = ap.parse_args()
 
 
 class MDP:
@@ -57,21 +65,28 @@ class MDP:
         # policy = np.random.choice(
         #     np.arange(self.number_of_actions), self.number_of_states)
         policy = np.zeros(self.number_of_states, dtype=int)
+        new_policy = np.zeros(self.number_of_states, dtype=int)
         # print(policy)
         iteration = 0
         while True:
-            delta = 0.0
-            iteration += 1
-            for s in range(self.number_of_states):
-                v = V[s]
-                v_temp = 0
-                for sPrime in range(self.number_of_states):
-                    v_temp += self.transition[s][policy[s]][sPrime] * \
-                        (self.reward[s][policy[s]][sPrime] +
-                         self.discount_factor * V[sPrime])
+            i = 0
+            iteration = iteration + 1
+            while True:
+                delta = 0.0
+                # iteration += 1
+                for s in range(self.number_of_states):
+                    v = V[s]
+                    v_temp = 0
+                    for sPrime in range(self.number_of_states):
+                        v_temp += self.transition[s][policy[s]][sPrime] * \
+                            (self.reward[s][policy[s]][sPrime] +
+                             self.discount_factor * V[sPrime])
 
-                V[s] = v_temp
-                delta = max(delta, np.abs(v - V[s]))
+                    V[s] = v_temp
+                    delta = max(delta, np.abs(v - V[s]))
+
+                if delta < 0.00000001:
+                    break
             # print(V)
             # print(delta)
 
@@ -84,12 +99,14 @@ class MDP:
                             (self.reward[s][a][sPrime] +
                              self.discount_factor * V[sPrime])
 
-                policy[s] = np.argmax(action)
+                new_policy[s] = np.argmax(action)
 
-            if delta < 0.00000000001:
+                if policy[s] != new_policy[s]:
+                    policy[s] = new_policy[s]
+                    i = i + 1
+
+            if i == 0:
                 break
-
-            # policy_stable = True
             # if old_action.all() == policy.all():
             #    policy_stable = True
             # else:
@@ -202,11 +219,24 @@ class MDP:
         return V, policy
 
 
-x = MDP("/home/sudhirsuman/Desktop/7thSemester/CS747/Assignment/cs747-pa2/data/episodic/MDP10.txt", 'lp')
-y, p = x.policy_iteration_by_linear_equation()
-print(y)
-print(p)
+# x = MDP("/home/sudhirsuman/Desktop/7thSemester/CS747/Assignment/cs747-pa2/data/episodic/MDP10.txt", 'lp')
+# y, p = x.policy_iteration_by_linear_equation()
+# print(y)
+# print(p)
+#
+# v, p = x.linear_programmming()
+# print(v)
+# print(p)
 
-v, p = x.linear_programmming()
-print(v)
-print(p)
+alg = MDP(args.mdp, args.algorithm)
+
+if args.algorithm == "hpi":
+    #value, action = alg.policy_iteration_by_linear_equation()
+    value, action = alg.policy_iteration_by_converging()
+
+elif args.algorithm == "lp":
+    value, action = alg.linear_programmming()
+
+for i in range(len(value)):
+    sys.stdout.write(str(value[i]) + "\t" + str(action[i]) + "\n")
+    # sys.stdout.write("%.10f\n" % value[i])

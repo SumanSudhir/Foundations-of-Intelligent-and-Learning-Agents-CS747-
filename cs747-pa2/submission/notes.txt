@@ -1,0 +1,21 @@
+I have done policy iteration both by solving linear equation and also by
+converging the value but In case of convergence my answer was coming correct
+upto 6-7 places of decimal on given solution set but in case of solving it
+using pulp it was fluctuatiing too even on 2nd or 3rd places of decimal so
+I decided to output the solution by convergence method
+
+
+There are six states in which the first and the last are the terminal state. The person have to move either left[action 0] or to the right [action 1] in order to get maximum rewards
+
+The reward is like 
+[10] [0] [0] [0] [0] [4.1]
+
+When discount factor is in the range [0.01 0.39] the optimal movement of the person will be like this
+[Terminal State][<<][<<][>>][>>][Terminal State]
+ 
+
+When discount factor is in the range [0.41 0.74] the optimal movement of the person will be like this
+[Terminal State][<<][<<][<<][>>][Terminal State]
+
+When discount factor is in the range [0.76 0.99] the optimal movement of the person will be like this
+[Terminal State][<<][<<][<<][<<][Terminal State]

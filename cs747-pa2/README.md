@@ -223,34 +223,6 @@ the results obtained by your program, and may also call you to a
 face-to-face session to explain your code.</p>
 
 
-<h3>Deadline and Rules</h3>
-
-<p>Your submission is due by 11.55 p.m., Sunday, September 15. Finish
-  working on your submission well in advance, keeping enough time to
-  test your code and upload to Moodle.</p>
-
-<p>Your submission will not be evaluated (and will be given a score of
-  zero) if it is not uploaded to Moodle by the deadline. Do not send
-  your code to the instructor or TAs through any other
-  channel. Requests to evaluate late submissions will not be
-  entertained.</p>
-
-<p>Your submission will receive a score of zero if your code does not
-execute on the sl2 machines. To make sure you have uploaded the right
-version, download it and check after submitting (but before the
-deadline, so you can handle any contingencies before the deadline
-lapses). If your code needs any special libraries to run on the sl2
-machines, it is <b>your</b> responsibility to get them installed. You
-can do so
-by <a href="https://bugs.cse.iitb.ac.in/bugs/enter_bug.cgi">filing a
-bug</a> with the CSE system administrators.</p>
-
-<p>You are expected to comply with the rules laid out in the "Academic
-Honesty" section on the course web page, failing which you are liable
-to be reported for academic malpractice.</p>
-
-
-
 <h3>References for Linear Programming</h3>
 
 <p>Although you are free to use any library of your choice for LP, we

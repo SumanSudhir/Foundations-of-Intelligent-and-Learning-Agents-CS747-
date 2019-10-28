@@ -36,9 +36,12 @@ def value_function(dataFileName):
     alpha = 100.0/episode
     value = [0]*number_of_states
     m = 0
+
     while(m<5):
+        state_count = [0]*number_of_states
         for i in range(episode):
-            value[states[i]] += alpha*(reward[i] + discount_factor*value[states[i+1]] - value[states[i]])
+            state_count[states[i]] += 1
+            value[states[i]] += (1.0/state_count[states[i]])*(reward[i] + discount_factor*value[states[i+1]] - value[states[i]])
         m += 1
 
     for element in value:

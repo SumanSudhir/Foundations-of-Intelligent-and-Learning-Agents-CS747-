@@ -1,0 +1,10 @@
+I have used Temporal Difference TD(0) Learning algorithm for estimating the value function.
+I have used the actual value of learning rate which comes from the derivation of TD(0) algorithm
+instead of manually tuning it so that it can perform well on unseen data.
+I have selected this algorithm TD(0) for this problem because it does not require the rewards and
+probability distributions and estimates the value function from MDP trajectory. We only need one
+time step at a time while estimating value function we dont have to wait till the end of episodes like Monte Carlo method.
+It is given that the number of transition can't exceed 500,000 therfore I have used TD(lambda = 0) since there will be
+negligiable issue of slow convergence. I have put the constraint that stop converging if the
+difference between current and previous estimated value is less than 10^-4 or max run the converging algorithm for 30 times.
+when the number of steps is large it is conevrging fastely in 3-4 loops as compared to when the number of step is small

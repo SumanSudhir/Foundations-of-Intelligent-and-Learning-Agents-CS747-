@@ -33,13 +33,12 @@ def value_function(dataFileName):
 
     n_plus_state = data_file.readline()
     states.append(int(n_plus_state))
-    alpha = 100.0/episode
     prev_value = [0]*number_of_states
     value = [0]*number_of_states
     diff = np.inf
     m = 0
 
-    while(diff > 10**(-3) and m < 30):
+    while(diff > 10**(-4) and m < 30):
         state_count = [0]*number_of_states
         for i in range(episode):
             state_count[states[i]] += 1

@@ -1,0 +1,2 @@
+1. http://incompleteideas.net/book/RLbook2018trimmed.pdf
+2. https://medium.com/@violante.andre/simple-reinforcement-learning-temporal-difference-learning-e883ea0d65b0

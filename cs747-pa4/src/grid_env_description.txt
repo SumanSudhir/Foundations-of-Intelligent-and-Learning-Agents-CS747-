@@ -1,9 +1,0 @@
-Number of rows in grid world, Number of column in grid world
-Starting point row index, Starting point column column index   #Count starting from index 0
-Ending poiint row index, Ending point column index    #Count starting from index 0
-Strength of wind at each column [0, 1, 2]
-Wind Stochastic or Non Stochastic [1 ,0]
-Number of action allowed
-epsilon   # For epsilon greedy
-Alpha
-Gamma

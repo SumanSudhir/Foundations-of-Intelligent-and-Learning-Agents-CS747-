@@ -3,7 +3,6 @@ import sys
 
 import numpy as np
 
-
 class windyGridWorld:
 
     def __init__(self,env_file):
@@ -86,57 +85,6 @@ class windyGridWorld:
         return next_state_row, next_state_colm
 
 
-    # def state_transition(self,current_state_row, current_state_colm, current_action):
-    #     """ right = 0, up = 1, left = 2, down = 3, up-right = 4, up-left = 5
-    #         down-left = 6, down-right = 7
-    #     """
-    #     next_state_row = current_state_row
-    #     next_state_colm = current_state_colm
-    #
-    #     if current_action == 0:
-    #         next_state_colm += 1
-    #
-    #     elif current_action == 1:
-    #         next_state_row += 1
-    #
-    #     elif current_action == 2:
-    #         next_state_colm -= 1
-    #
-    #     elif current_action == 3:
-    #         next_state_row -= 1
-    #
-    #     elif current_action == 4:
-    #         next_state_colm += 1
-    #         next_state_row += 1
-    #
-    #     elif current_action == 5:
-    #         next_state_colm -= 1
-    #         next_state_row += 1
-    #
-    #     elif current_action == 6:
-    #         next_state_colm -= 1
-    #         next_state_row -= 1
-    #
-    #     elif current_action == 7:
-    #         next_state_colm += 1
-    #         next_state_row -= 1
-    #
-    #     next_state_row += int(self.wind_strength[current_state_colm])
-    #
-    #     if next_state_row < 0:
-    #         next_state_row = 0
-    #
-    #     if next_state_colm < 0:
-    #         next_state_colm = 0
-    #
-    #     if next_state_row > self.number_of_rows-1:
-    #         next_state_row = self.number_of_rows-1
-    #
-    #     if next_state_colm > self.number_of_colms-1:
-    #         next_state_colm = self.number_of_colms-1
-    #
-    #     return next_state_row, next_state_colm
-
     def epsilon_greddy(self,value,current_row,current_colm):
 
         action_number = np.arange(self.number_of_actions)
@@ -153,10 +101,8 @@ class windyGridWorld:
         if x == "eps_conj":
             for a in action_number:
                 action_value[a] = value[current_row][current_colm][a]
-
             action = np.argmax(action_value)
 
-        #print(action)
         return action
 
 
@@ -174,20 +120,14 @@ class windyGridWorld:
                 reward = -1
                 next_row, next_colm = self.state_transition(current_row, current_colm, action)
                 next_action = self.epsilon_greddy(value, next_row, next_colm)
-                #print(next_action)
                 value[current_row][current_colm][action] += self.alpha*(reward + self.decay_factor*value[next_row][next_colm][next_action] - value[current_row][current_colm][action])
 
                 current_row = next_row
                 current_colm = next_colm
                 action = next_action
                 iteration += 1
-                #print(value)
-                print(current_row, current_colm, action)
 
         return iteration
 
-cls = windyGridWorld("grid_world_env.txt")
-# cls.epsilon_greddy()
-# y,x = cls.state_transition(5,2,0)
-t = cls.Sarsa()
-print(t)
+
+# cls = windyGridWorld(args.env_file)

@@ -40,6 +40,8 @@ class windyGridWorld:
         read_line = env_file.readline()
         self.decay_factor = float(read_line)
 
+        self.reward =
+
 
     def epsilon_greddy(self):
         print(self.epsilon)
@@ -52,7 +54,6 @@ class windyGridWorld:
         """
         next_state_row = current_state_row
         next_state_colm = current_state_colm
-
 
         if current_action == 0 and current_state_colm < self.number_of_colms-1:
             next_state_colm += 1
@@ -88,6 +89,29 @@ class windyGridWorld:
 
 
 
+    def Sarsa(self):
+        value = np.zeros((self.number_of_rows, self.number_of_colms, self.number_of_actions))
+
+        for i in range(episode):
+            current_row = self.start_row
+            current_colm = self.start_colm
+
+            action = self.epsilon_greddy()
+
+            while(current_row != self.target_row or current_colm != self.target_colm):
+                reward = -1
+                next_row, next_colm = self.state_transition(current_row, current_colm, action)
+                next_action = self.epsilon_greddy()
+
+                value[current_row][current_colm][action] += self.alpha*(reward + self.decay_factor*value[next_row][next_colm][next_action] - value[current_row][current_colm][action])
+
+                current_row = next_row
+                current_colm = next_colm
+                action = next_action
+
+
+
+
 cls = windyGridWorld("grid_world_env.txt")
 # cls.epsilon_greddy()
 y,x = cls.state_transition(5,2,0)
@@ -98,18 +122,10 @@ print(y,x)
 
 
 
-# def reward_function(num_state,num_action):
-#
-#     reward = np.zeros((num_state, num_action, num_state))
-#     transition = np.zeros((num_state, num_action, num_state))
-#
-#     for s in range(num_state):
-#         for a in range(num_action):
-#             for sPrime in range(num_state):
-#
-#
-#
-#
-#     for s in range(num_state):
-#         for a in range(num_action):
-#             for sPrime in range(num_state):
+
+
+
+
+for s in range(num_state):
+    for a in range(num_action):
+        for sPrime in range(num_state):

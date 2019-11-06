@@ -79,8 +79,16 @@ class windyGridWorld:
 
         next_state_row += int(self.wind_strength[current_state_colm])
 
+        #Stochastic Wind Case
+        if self.wind_nature == 1:
+            next_state_row += int(np.random.choice([-1,0,1], 1, p=[1/3, 1/3, 1/3]))
+
+
         if next_state_row > self.number_of_rows-1:
             next_state_row = self.number_of_rows-1
+
+        if next_state_row < 0:
+            next_state_row = 0
 
         return next_state_row, next_state_colm
 

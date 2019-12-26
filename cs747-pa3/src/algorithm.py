@@ -39,7 +39,7 @@ def value_function(dataFileName):
     diff = np.inf
     m = 0
 
-    while(diff > 10**(-3) and m < 30):
+    while(diff > 10**(-7) and m < 150):
         state_count = [0]*number_of_states
         for i in range(episode):
             state_count[states[i]] += 1

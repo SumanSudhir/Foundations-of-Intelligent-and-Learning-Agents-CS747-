@@ -1,248 +1,162 @@
+</head>
+
+<body data-gr-c-s-loaded="true">
+
 <center>
 <h2>
-CS 747: Programming Assignment 2
+CS 747: Programming Assignment 3
 </h2>
 </center>
 
-<p>In this assignment, you will implement algorithms for finding an
-optimal policy for a given MDP. The first part of the assignment is to
-apply Linear Programming, based on the formulation presented in class.
-The second part of the assignment is to implement Howard's Policy
-Iteration. The third part of the assignment requires you to construct
-MDPs whose optimal policies satisfy a specified condition; you will
-use your solvers to validate your construction.</p>
+<p>In this assignment, you will implement an algorithm for estimating
+  the value function of a policy for a given MDP from a trajectory of
+  the form state, action, reward, state, action, reward, ….</p>
+
+<br>
+<h3>Data Format</h3> 
 
 
-<h3>Data</h3>
-
-<p>This <a href="https://www.cse.iitb.ac.in/~shivaram/teaching/cs747-a2019/pa-2/data.tar.gz">directory</a> provides a few samples
-of input and output that you can use to test your code. The directory
-contains four MDPs encoded as text files, with each file in the
-following format.</p>
+<p>The input to your "evaluator" will be a text file that provides
+information in the following format.</p>
 
 <pre><code>Number of states
 Number of actions
-Reward function
-Transition function
 Discount factor
-Type
-</code></pre>
-
-<p>In these files, and also in the MDPs on which your algorithms will
-be tested, the number of states S will be an integer greater than 0
-and less than 150. Assume that the states are numbered 0, 1, 2,
-ï¿½, (S - 1). Similarly, actions will be numbered 0, 1, 2,
-ï¿½, (A - 1), where A is less than 100. The reward function will
-be provided over Sï¿½A lines, each line containing S entries. Each
-entry corresponds to R(s, a, s'), wherein state s, action a, and state
-s' are being iterated in sequence from 0 to (S - 1), 0 to (A - 1), and
-0 to (S - 1), respectively. A similar scheme is adopted for the
-transition function T. Each reward lies between -1 and 1 (both
-included). The discount factor is a real number in [0, 1]. However,
-the discount factor will only be set to 1 if the underlying task is
-episodic. The last field in the file, denoted Type, will either be
-"continuing" or "episodic". If episodic, it is our convention that the
-very last state (numbered S - 1) will be a terminal state. The MDP
-will be such that for every starting state and policy, trajectories
-will eventually reach the terminal state.</p>
-
-
-<p>Below is a snippet of python code that is used to generate MDP files.</p>
-
-<pre><code>print S
-print A
-
-for s in range(0, S):
-    for a in range(0, A):
-        for sPrime in range(0, S):
-            print str(R[s][a][sPrime]) + "\t",
-
-        print "\n",
-
-for s in range(0, S):
-    for a in range(0, A):
-        for sPrime in range(0, S):
-            print str(T[s][a][sPrime]) + "\t",
-
-        print "\n",
-
-print gamma
-print type
-</code></pre>
-
-
-<h3>Solution</h3>
-
-<p>Given an MDP, your program must compute the optimal value
-function V* and an optimal policy &#960;* by applying the algorithm that
-is specified through the command line. Create a shell script
-called <code>planner.sh</code> to invoke your program. The arguments
-to <code>planner.sh</code> will be</p>
-
-<ul>
-<li><code>--mdp</code> followed by a full path to the input MDP file, and</li>
-<li><code>--algorithm</code> followed by one of <code>lp</code> and <code>hpi</code>.</li>
-</ul>
-
-<p>Make no assumptions about the location of the MDP file relative to
-the current working directory; read it in from the full path that will
-be provided. The algorithms specified above correspond to Linear
-Programming and Howard's Policy Iteration, respectively. Here are a few examples of
-how your planner might be invoked (it will always be invoked from its
-own directory).</p>
-
-<ul>
-<li><code>./planner.sh --mdp /home/user/temp/data/mdp-7.txt --algorithm lp</code></li>
-<li><code>./planner.sh --mdp /home/user/mdpfiles/mdp-5.txt --algorithm hpi</code></li>
-</ul>
-
-<p>You are free to implement the planner in any programming language
-of your choice. You are not expected to code up a solver for LP;
-rather, you can use available solvers as blackboxes (more below). Your
-effort will be in providing the LP solver the appropriate input based
-on the MDP, and interpreting its output appropriately. You are
-expected to write your own code for Howard's Policy Iteration; you may
-not use any custom-built libraries that might be available for the
-purpose. You can use libraries for solving linear equations in the
-policy evaluation step, but must write your own code for policy
-improvement. Recall that Howard's Policy Iteration switches <b>all</b>
-improvable states to some improving action; if there are two or more
-improving actions at a state, you are free to pick any one.</p>
-
-
-<h3>Output Format</h3>
-
-<p>The output of your planner must be in the following format,
-and <strong>written to standard output</strong>.</p>
-
-<pre><code>V*(0)   &#960;*(0)
-V*(1)   &#960;*(1)
+state1 action1 reward1
+state2 action2 reward2
+state3 action3 reward3
 .
 .
 .
-V*(S - 1)   &#960;*(S - 1)
+stateN actionN rewardN
+stateN+1
 </code></pre>
 
-<p>In the <code>data</code> directory provided, you will find four
-output files corresponding to the MDP files, which have solutions in
-the format above.</p>
+<p>The number of states <code>S</code> and the number of
+actions <code>A</code> will be integers greater than 0. Assume that the
+states are numbered 0, 1, ..., <code>S</code> - 1, and the actions
+numbered 0, 1, ..., <code>A</code> - 1. The discount factor will lie
+between 0 (included) and 1 (excluded). The trajectory over time will
+be long enough, and the dynamics of the underlying MDP such, that
+there is at least one outgoing transition from each state in the
+MDP. Note that the MDP is <i>not</i> episodic: that is, stateN+1 is not a
+terminal state (and can occur within the trajectory multiple
+times). The trajectory is merely a finite sequence generated according
+to the underlying transition and reward functions, and terminated at
+some arbitrary time step.</p>
 
-<p>Since your output will be checked automatically, make sure you have
-nothing printed to stdout other than the S lines as above in
-sequence. If the testing code is unable to parse your output, you will
-not receive any marks.</p>
+<p>You can assume that <code>S</code> and <code>A</code> will not
+exceed 50, and N, the total number of transitions in the trajectory,
+will not exceed 500,000. In this <a href="https://www.cse.iitb.ac.in/~shivaram/teaching/cs747-a2019/pa-3/data.tar.gz">data</a>
+directory, you will find two sample data files (<code>d1.txt</code>
+and <code>d2.txt</code>).</p>
 
-<blockquote>
-  <p><strong>Note:</strong></p>
+<br>
+<h3>Output</h3> 
 
-  <ol>
-  <li>Your output has to be written to the standard output, not to any file.</li>
-  <li>For values, print at least 6 places after the decimal point. Print more if you'd like, but 6 (<code>xxx.123456</code>) will suffice.</li>
-  <li>If your code produces output that resembles the solution files: that is, S lines of the form
+<p>Given a data file, your evaluator must estimate the value
+function <code>V</code> under the policy being followed. The output,
+written to standard output, must be in the following format
+(<code>Est-V</code> is your estimate of <code>V</code>).</p>
 
-<pre><code>value + "\t" + action + "\n"
+<pre><code>Est-V(0)
+Est-V(1)
+.
+.
+.
+Est-V(S - 1)
 </code></pre>
 
-  or even
+<p>In the data directory enclosed, you will find output files
+corresponding to the two data files, which have solutions in the
+format above. The values mentioned in these output files are indeed
+the <i>true</i> values (under the same policy) from the MDP being
+sampled. Naturally, as you will have to estimate values based on
+samples alone, your estimates cannot be expected to match the true
+values perfectly.</p>
 
-<pre><code>value + " " + action + "\n"
-</code></pre>
+<p>Notice that since this is a prediction problem, wherein a fixed
+policy is being followed, the actual names of the actions
+taken do not matter. Nor does it matter if the policy being followed
+  is deterministic or stochastic. Your logic only needs to consider 
+  the state, reward, and next state associated with each transition.</p>
 
-  <p>you should be okay. Make sure you don't print anything else.</p></li>
-  <li>If there are multiple optimal policies, feel free to print any one of them.</li>
-  </ol>
-</blockquote>
+<p>You are free to implement the evaluator in any programming language
+of your choice. Since your output will be checked automatically, make
+sure you have nothing printed to stdout other than the <code>S</code>
+lines as above in sequence. If the testing code is unable to parse
+your output, you will not receive any marks.</p>
 
-<h3>Effect of Discount Factor on Optimal Policies</h3>
+<br>
+<h3>Submission</h3> 
 
-<p>
-  This part of the assignment requires you to design a family of MDPs
-  that satisfy a specified property. While coming up with your answer,
-  you can use your own solver to quickly check if you are on the right
-  track.</p>
+Create a directory called <code>submission</code>. The directory must
+contain a script titled <code>evaluator.sh</code>, which must take in
+exactly one command line argument corresponding to a data file. For
+testing your code, the following command will be used from
+your <code>submission</code> directory.<p></p>
 
-<p> What you need to construct is a family of MDPs that only differ in
-  their discount factor: that is, they will all have the same set of
-  states, set of actions, transition function, reward function, and type. The
-  family must be such that all MDP instances with a discount factor in
-  [0.01, 0.39]) must have the same (and unique) optimal policy
-  &#960;<sub>1</sub>; all MDP instances with a discount factor in [0.41,
-  0.74] must have the same (and unique) optimal policy &#960;<sub>2</sub>;
-  all MDP instances with a discount factor in [0.76, 0.99]) must have the
-  same (and unique) optimal policy &#960;<sub>3</sub>; such that
-  &#960;<sub>1</sub> &#8800; &#960;<sub>2</sub>; &#8800; &#960;<sub>3</sub>; &#8800;
-  &#960;<sub>1</sub>. The MDPs must all be continuing, and have
-  exactly 2 actions. They may have at most 10 states.</p>
+<code>./evaluator.sh dataFileName</code>
 
-<p>Once you have worked out your family, encode it in the same format
-  of the MDPs you have been provided. You only need to provide a
-  single instance, with a discount factor of 0.5; call the
-  instance <code>mdp-family.txt</code>. We will create multiple MDP
-  instances that only differ in the discount factor, and run our own
-  code to compute their optimal policies.</p>
+<p>wherein <code>dataFileName</code> will include the full path.
+  
+</p><p>Include a file called <code>notes.txt</code> in the
+<code>submission</code> directory, that describes the algorithm your
+evaluator implements.
 
 
-<h3>Submission</h3>
+In summary: you will place the following files in <code>submission</code>.
 
-Place these items in a directory named <code>submission</code>.
-
-<ul class="plain">
+</p><ul class="plain">
 <li>
-  <code>planner.sh</code> and all the code that it needs to run.
+  <code>evaluator.sh</code> and all the code that it needs to run.
 </li>
 <li>
-<code>mdp-family.txt</code>.
+<code>notes.txt</code>
 </li>
 <li>
-<code>notes.txt</code> (You can describe your code and MDP construction if you would like us to see, but this item is optional.).
-</li>
-<li>
-<code>references.txt</code> (See the section on Academic Honesty on the course web page.).
+<code>references.txt</code> (see the section on Academic Honesty on the course web page)
 </li>
 </ul>
 
 <p>Compress the directory into <code>submission.tar.gz</code> and upload
-on Moodle under Programming Assignment 2.</p>
+on Moodle under Programming Assignment 3.</p>
 
 
-<h3>Evaluation</h3>
+<br>
+<h3>Evaluation</h3> 
+
+<p>Your evaluator will be tested on trajectories generated from
+different MDPs and policies. Your task is to ensure that it prints out
+a good estimate of the true value function in each case. Performance
+will be quantified based on the (unweighted) squared distance between
+your estimate <code>Est-V</code> and the true value
+function <code>V</code>: that is,</p>
+
+<code>Error = &#8721;<sub>s&#8946;S</sub> (V(s) - Est-V(s))<sup>2</sup></code>.
+
+<p>Recall that as a part of Programming Assignment 2, you had written
+code for MDP planning. It will be a good idea for you to build a
+testing framework using that code to (1) generate and record
+trajectories of some fixed policy &#960; for some MDP M; (2) estimate
+the value function of &#960; as required in this assignment; and (3) compare
+your estimate with the true value function, which you can compute
+using your own code from Programming Assignment 2. This is exactly
+the scheme that we will use for evaluating your answers.</p>
+
+<p>8 marks are reserved for the performance of your evaluator on
+unseen trajectories, and 2 marks for your explanations
+in <code>notes.txt</code>. Be sure to describe your approach and
+explain why you chose it over alternative approaches.</p>
+
+<p>The TAs and instructor may look at your source code and notes to
+corroborate the results obtained by your program, and may also call
+you to a face-to-face session to explain your code.</p>
 
 
-<p>Your planner will be tested on a large number of MDPs. Your task is
-to ensure that it prints out the correct solution (V* and &#960;*) in
-each case, using each of the algorithms you have been asked to
-implement. 4 marks each are allotted for the correctness of your
-Linear Programming and Howard's Policy Iteration algorithms. 2 marks
-are allotted for the correctness of the MDP family you construct. We
-shall verify correctness by computing and comparing optimal policies
-for a large number of MDPs from the family (obtained by varying the
-discount factor in <code>mdp-family.txt</code>).</p>
-
-<p>The TAs and instructor may look at your source code to corroborate
-the results obtained by your program, and may also call you to a
-face-to-face session to explain your code.</p>
+<br>
 
 
-<h3>References for Linear Programming</h3>
-
-<p>Although you are free to use any library of your choice for LP, we
-recommend that you use the Python
-library <code>PuLP</code> (<a href="https://pythonhosted.org/PuLP/">https://pythonhosted.org/PuLP/</a>)
-or the <code>lp_solve</code> program
-(<a href="http://lpsolve.sourceforge.net/5.5/">http://lpsolve.sourceforge.net/5.5/</a>). Both
-of these are already installed on the <code>sl2</code> machines.</p>
 
 
-<p><code>PuLP</code> is convenient to use directly from Python code:
-here is a <a href="https://www.youtube.com/watch?v=7yZ5xxdkTb8">short
-tutorial</a> and here is
-a <a href="https://www.coin-or.org/PuLP/index.html">reference</a>.</p>
-
-<p><code>lp_solve</code> can be used both through an API and through
-the command line. Here is
-a <a href="http://lpsolve.sourceforge.net/5.5/">reference</a> and here
-is
-an <a href="http://lpsolve.sourceforge.net/5.5/formulate.htm">introductory
-example</a>.</p>
-</body></html>
 
